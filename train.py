@@ -156,6 +156,7 @@ for iter_num in tqdm(range(train_config.train_iters)):
         with ctx:
             logits, loss = model(X, Y)
             loss = loss / train_config.gradient_accumulation_steps
+            writer.add_scalar("step_train_loss", loss, iter_num * train_config.gradient_accumulation_steps + micro_step)
         X, Y = next(train_batch_iter)
         scaler.scale(loss).backward()
 
