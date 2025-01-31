@@ -1,3 +1,5 @@
+from datetime import datetime
+from pathlib import Path
 from model import GPT
 from config import GPTConfig, TrainingConfig
 from functools import partial
@@ -8,8 +10,6 @@ import torch
 from torch.utils.tensorboard.writer import SummaryWriter
 from dataset import Task
 
-out_dir = "out/"
-writer = SummaryWriter(log_dir=os.path.join(out_dir, "logs"))
 def save_checkpoint(model, model_args, iter_num, best_val_loss):
     checkpoint = {
         "model": model.state_dict(),
@@ -26,6 +26,8 @@ train_config = TrainingConfig(
     device="mps",
     train_iters=100,
     eval_interval=10)
+out_dir = Path("out/")
+writer = SummaryWriter(log_dir=out_dir / "logs" / datetime.now().strftime('%Y-%M-%D-%H:%m:%s'), flush_secs=2)
 resume = False
 
 tokens_per_iter = (
