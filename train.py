@@ -8,7 +8,6 @@ import torch
 from torch.utils.tensorboard.writer import SummaryWriter
 from dataset import Task
 
-train_config = TrainingConfig()
 out_dir = "out/"
 writer = SummaryWriter(log_dir=os.path.join(out_dir, "logs"))
 def save_checkpoint(model, model_args, iter_num, best_val_loss):
@@ -21,6 +20,12 @@ def save_checkpoint(model, model_args, iter_num, best_val_loss):
     print(f"Saving checkpoint to {out_dir}...", end=None)
     torch.save(checkpoint, os.path.join(out_dir, "ckpt.pt"))
     print(" done")
+
+train_config = TrainingConfig(
+    compile=False, 
+    device="mps",
+    train_iters=100,
+    eval_interval=10)
 resume = False
 
 tokens_per_iter = (
