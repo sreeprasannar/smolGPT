@@ -32,7 +32,8 @@ class CausalSelfAttention(nn.Module):
     def forward(self, x):
         B, T, C = x.shape
 
-        q, k, v = self.c_attn(x).split(self.config.n_embed, dim=2)
+        c_attn_output = self.c_attn(x)
+        q, k, v = c_attn_output.split(self.config.n_embed, dim=2)
         q = q.view(B, T, self.config.n_head, C // self.config.n_head).transpose(1, 2)
         k = k.view(B, T, self.config.n_head, C // self.config.n_head).transpose(1, 2)
         v = v.view(B, T, self.config.n_head, C // self.config.n_head).transpose(1, 2)
