@@ -171,9 +171,4 @@ for iter_num in tqdm(range(train_config.train_iters)):
     dt = t1 - t0
     t0 = t1
 
-    if iter_num % train_config.log_interval == 0:
-        lossf = loss.item() * train_config.gradient_accumulation_steps
-        print(f"iter {iter_num}: loss {lossf:.4f}, time {dt*1000:.2f}ms")
-
-
 writer.close()
