@@ -1,5 +1,6 @@
 from datetime import datetime
 from pathlib import Path
+from tqdm import tqdm
 from model import GPT
 from config import GPTConfig, TrainingConfig
 from functools import partial
@@ -133,7 +134,7 @@ X, Y = next(train_batch_iter)
 
 iter_num = 0
 t0 = time.time()
-while True:
+for iter_num in tqdm(range(train_config.train_iters)):
     lr = get_lr(iter_num) if train_config.decay_lr else train_config.learning_rate
     for param_group in optimizer.param_groups:
         param_group["lr"] = lr
@@ -173,9 +174,5 @@ while True:
         lossf = loss.item() * train_config.gradient_accumulation_steps
         print(f"iter {iter_num}: loss {lossf:.4f}, time {dt*1000:.2f}ms")
 
-    iter_num += 1
-
-    if iter_num > train_config.max_iters:
-        break
 
 writer.close()
