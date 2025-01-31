@@ -11,6 +11,16 @@ from dataset import Task
 train_config = TrainingConfig()
 out_dir = "out/"
 writer = SummaryWriter(log_dir=os.path.join(out_dir, "logs"))
+def save_checkpoint(model, model_args, iter_num, best_val_loss):
+    checkpoint = {
+        "model": model.state_dict(),
+        "model_args": model_args,
+        "iter_num": iter_num,
+        "best_val_loss": best_val_loss,
+    }
+    print(f"Saving checkpoint to {out_dir}...", end=None)
+    torch.save(checkpoint, os.path.join(out_dir, "ckpt.pt"))
+    print(" done")
 resume = False
 
 tokens_per_iter = (
@@ -132,14 +142,7 @@ while True:
 
         if losses["val"] < best_val_loss:
             best_val_loss = losses["val"]
-            checkpoint = {
-                "model": model.state_dict(),
-                "model_args": model_args,
-                "iter_num": iter_num,
-                "best_val_loss": best_val_loss,
-            }
-            print(f"Saving checkpoint to {out_dir}")
-            torch.save(checkpoint, os.path.join(out_dir, "ckpt.pt"))
+            save_checkpoint(model, model_args, iter_num, best_val_loss)
 
     for micro_step in range(train_config.gradient_accumulation_steps):
         with ctx:
