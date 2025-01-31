@@ -48,8 +48,8 @@ def parse_args():
     parser.add_argument(
         "--device",
         type=str,
-        default="cuda",
-        choices=["cuda", "cpu"],
+        default="mps",
+        choices=["cuda", "cpu", "mps"],
         help="Device to run inference on",
     )
     parser.add_argument(
@@ -83,7 +83,7 @@ def setup_device(args):
 
 
 def load_model(args):
-    ckpt_path = os.path.join(args.ckpt_dir, "ckpt-v1.pt")
+    ckpt_path = os.path.join(args.ckpt_dir, "ckpt.pt")
     checkpoint = torch.load(ckpt_path, map_location=args.device)
     gptconf = GPTConfig(**checkpoint["model_args"])
     model = GPT(gptconf)
