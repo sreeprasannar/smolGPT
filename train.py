@@ -22,11 +22,16 @@ def save_checkpoint(model, model_args, iter_num, best_val_loss):
     torch.save(checkpoint, os.path.join(out_dir, "ckpt.pt"))
     print(" done")
 
+def forward_hook_for_causal_attention_block(writer: SummaryWriter, block_idx: int, module: "nn.Module", x):
+    writer.add_histogram(f'attention_block_input_length_block_{block_idx}', x[0].shape[1])
+    return x
+
 train_config = TrainingConfig(
     compile=False, 
     device="mps",
-    train_iters=100,
-    eval_interval=10)
+    train_iters=1,
+    eval_interval=1,
+    batch_size=32)
 out_dir = Path("out/")
 writer = SummaryWriter(log_dir=out_dir / "logs" / datetime.now().strftime('%Y-%M-%D-%H:%m:%s'), flush_secs=2)
 resume = False
@@ -65,11 +70,12 @@ iter_batches = partial(
 )
 
 best_val_loss = 1e9
+writer_hook = partial(forward_hook_for_causal_attention_block, writer)
 if resume:
     ckpt_path = os.path.join(out_dir, "ckpt.pt")
     checkpoint = torch.load(ckpt_path, map_location=train_config.device)
     gptconf = GPTConfig(**checkpoint["model_args"])
-    model = GPT(gptconf)
+    model = GPT(gptconf, writer_hook)
     state_dict = checkpoint["model"]
     unwanted_prefix = "_orig_mod."
     best_val_loss = checkpoint["best_val_loss"]
@@ -81,7 +87,7 @@ if resume:
     print("Loaded checkpoint")
 else:
     gptconf = GPTConfig(**model_args)
-    model = GPT(gptconf).to(train_config.device)
+    model = GPT(gptconf, writer_hook).to(train_config.device)
 
 scaler = torch.GradScaler(enabled=(train_config.dtype == "float16"))
 optimizer = model.configure_optimizers(

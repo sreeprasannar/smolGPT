@@ -1,3 +1,4 @@
+from functools import partial
 import math
 import torch
 import torch.nn as nn
@@ -78,12 +79,14 @@ class FeedForward(nn.Module):
 
 
 class Block(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, block_idx: int, forward_hook=None):
         super().__init__()
         self.ln_1 = nn.RMSNorm(config.n_embed)
         self.attn = CausalSelfAttention(config)
         self.ln_2 = nn.RMSNorm(config.n_embed)
         self.ffd = FeedForward(config)
+        if forward_hook:
+            self.register_forward_pre_hook(partial(forward_hook, block_idx))
 
     def forward(self, x):
         x = x + self.attn(self.ln_1(x))
@@ -92,7 +95,7 @@ class Block(nn.Module):
 
 
 class GPT(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, forward_hook):
         super().__init__()
         self.config = config
 
@@ -101,7 +104,7 @@ class GPT(nn.Module):
                 wte=nn.Embedding(config.vocab_size, config.n_embed),
                 wpe=nn.Embedding(config.block_size, config.n_embed),
                 drop=nn.Dropout(config.dropout),
-                h=nn.ModuleList([Block(config) for _ in range(config.n_layer)]),
+                h=nn.ModuleList([Block(config, block_idx, forward_hook) for block_idx in range(config.n_layer)]),
                 ln_f=nn.RMSNorm(config.n_embed),
             )
         )
