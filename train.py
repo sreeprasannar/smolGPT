@@ -30,8 +30,8 @@ def forward_hook_for_causal_attention_block(writer: SummaryWriter, block_idx: in
 train_config = TrainingConfig(
     compile=False, 
     device="mps",
-    train_iters=1,
-    eval_interval=1,
+    train_iters=1000,
+    eval_interval=50,
     batch_size=32)
 out_dir = Path("out/")
 writer = SummaryWriter(log_dir=out_dir / "logs" / datetime.now().strftime('%Y-%m-%d/%H:%M:%s'), flush_secs=2)
