@@ -19,9 +19,7 @@ def save_checkpoint(model, model_args, iter_num, best_val_loss):
         "iter_num": iter_num,
         "best_val_loss": best_val_loss,
     }
-    print(f"Saving checkpoint to {out_dir}...", end=None)
     torch.save(checkpoint, os.path.join(out_dir, "ckpt.pt"))
-    print(" done")
 
 def forward_hook_for_causal_attention_block(writer: SummaryWriter, block_idx: int, module: "nn.Module", x):
     writer.add_histogram(f'attention_block_input_length_block_{block_idx}', x[0].shape[1])
@@ -149,9 +147,6 @@ for iter_num in tqdm(range(train_config.train_iters)):
 
     if iter_num % train_config.eval_interval == 0:
         losses = estimate_loss()
-        print(
-            f"step {iter_num}: train_loss {losses['train']:.4f}, val_loss {losses['val']:.4f}"
-        )
         writer.add_scalar("train_loss", losses["train"], iter_num)
         writer.add_scalar("val_loss", losses["val"], iter_num)
         writer.add_scalar("lr", lr, iter_num)
