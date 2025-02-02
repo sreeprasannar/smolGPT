@@ -1,5 +1,6 @@
 from datetime import datetime
 from pathlib import Path
+import numpy as np
 from tqdm import tqdm
 from model import GPT
 from config import GPTConfig, TrainingConfig
@@ -66,7 +67,8 @@ iter_batches = partial(
     max_seq_len=GPTConfig.block_size,
     device=train_config.device,
     num_workers=0,
-    max_shards=1
+    chunk_ratios=np.arange(0.1, 1.1, 0.1),
+    increase_chunk_ratio_every_n_shards=49
 )
 
 best_val_loss = 1e9
