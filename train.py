@@ -34,7 +34,7 @@ train_config = TrainingConfig(
     eval_interval=1,
     batch_size=32)
 out_dir = Path("out/")
-writer = SummaryWriter(log_dir=out_dir / "logs" / datetime.now().strftime('%Y-%M-%D-%H:%m:%s'), flush_secs=2)
+writer = SummaryWriter(log_dir=out_dir / "logs" / datetime.now().strftime('%Y-%m-%d/%H:%M:%s'), flush_secs=2)
 resume = False
 
 tokens_per_iter = (
