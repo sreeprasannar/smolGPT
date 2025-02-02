@@ -17,7 +17,7 @@ def parse_args():
     parser.add_argument(
         "--tokenizer_path",
         type=str,
-        default=os.path.join("out", "tok4096.model"),
+        default=os.path.join("data", "tok4096.model"),
         help="Path to tokenizer model",
     )
     parser.add_argument(
