@@ -95,7 +95,7 @@ class Block(nn.Module):
 
 
 class GPT(nn.Module):
-    def __init__(self, config, forward_hook):
+    def __init__(self, config, forward_hook=None):
         super().__init__()
         self.config = config
 
